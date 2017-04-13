@@ -66,14 +66,22 @@ module PagSeguro
         data[:installments] = xml.css("installmentCount").text.to_i
       end
 
+      # create parse fix error in BigDecimal Rails 2.4 version
+      def parse!(amount)
+          if amount == ""
+              amount = 0
+          end
+          return amount
+      end
+
       def serialize_creditor(data)
         data[:creditor_fees] = {
-          intermediation_rate_amount: BigDecimal(xml.css("creditorFees > intermediationRateAmount").text),
-          intermediation_fee_amount: BigDecimal(xml.css("creditorFees > intermediationFeeAmount").text),
-          installment_fee_amount: BigDecimal(xml.css("creditorFees > installmentFeeAmount").text),
-          operational_fee_amount: BigDecimal(xml.css("creditorFees > operationalFeeAmount").text),
-          commission_fee_amount: BigDecimal(xml.css("creditorFees > commissionFeeAmount").text),
-          efrete: BigDecimal(xml.css("creditorFees > efrete").text)
+          intermediation_rate_amount: BigDecimal(parse!(xml.css("creditorFees > intermediationRateAmount").text)),
+          intermediation_fee_amount: BigDecimal(parse!(xml.css("creditorFees > intermediationFeeAmount").text)),
+          installment_fee_amount: BigDecimal(parse!(xml.css("creditorFees > installmentFeeAmount").text)),
+          operational_fee_amount: BigDecimal(parse!(xml.css("creditorFees > operationalFeeAmount").text)),
+          commission_fee_amount: BigDecimal(parse!(xml.css("creditorFees > commissionFeeAmount").text)),
+          efrete: BigDecimal(parse!(xml.css("creditorFees > efrete").text))
         }
       end
 
